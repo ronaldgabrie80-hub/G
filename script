@@ -1,0 +1,70 @@
+let quizActive = false;
+let score = 0;
+let questionIndex = 0;
+
+const quiz = [
+    {
+        q: "Combien font 2 + 2 ?",
+        options: ["3", "4", "5"],
+        answer: "4"
+    },
+    {
+        q: "Quelle est la capitale de la France ?",
+        options: ["Lyon", "Paris", "Marseille"],
+        answer: "Paris"
+    },
+    {
+        q: "HTML signifie ?",
+        options: ["HyperText Markup Language", "HighText Machine Language", "Hot Mail"],
+        answer: "HyperText Markup Language"
+    }
+];
+function startQuiz(){
+    quizActive = true;
+    score = 0;
+    questionIndex = 0;
+
+    addMsg("🎯 Quiz démarré ! Bonne chance", "bot");
+    showQuestion();
+}
+function showQuestion(){
+    if(questionIndex >= quiz.length){
+        addMsg(`🏁 Quiz terminé ! Score : ${score}/${quiz.length}`, "bot");
+        quizActive = false;
+        return;
+    }
+
+    let q = quiz[questionIndex];
+
+    let div = document.createElement("div");
+    div.className = "msg bot";
+
+    div.innerHTML = `<b>${q.q}</b><br><br>`;
+
+    q.options.forEach(opt => {
+        let btn = document.createElement("button");
+        btn.innerText = opt;
+        btn.style.margin = "5px";
+        btn.onclick = () => checkAnswer(opt);
+        div.appendChild(btn);
+    });
+
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
+function checkAnswer(choice){
+    let q = quiz[questionIndex];
+
+    if(choice === q.answer){
+        score++;
+        addMsg("✅ Bonne réponse !", "bot");
+    } else {
+        addMsg("❌ Mauvaise réponse !", "bot");
+    }
+
+    questionIndex++;
+    setTimeout(showQuestion, 800);
+}
+function quizMode(){
+    startQuiz();
+}
