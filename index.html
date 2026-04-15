@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Gabriel IA</title>
+<title>Gabriel IA Pro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -13,21 +13,13 @@ body {
     color: white;
 }
 
-/* HEADER */
 header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     padding: 15px;
     background: #111827;
+    display: flex;
+    justify-content: space-between;
 }
 
-.title {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-/* CHAT */
 #chat {
     height: 70vh;
     overflow-y: auto;
@@ -50,7 +42,6 @@ header {
     background: #374151;
 }
 
-/* INPUT */
 #inputArea {
     display: flex;
     padding: 10px;
@@ -60,8 +51,8 @@ header {
 input {
     flex: 1;
     padding: 10px;
-    border-radius: 8px;
     border: none;
+    border-radius: 8px;
 }
 
 button {
@@ -71,56 +62,26 @@ button {
     border-radius: 8px;
     cursor: pointer;
 }
-
-#menu {
-    position: relative;
-}
-
-#menuContent {
-    display: none;
-    position: absolute;
-    right: 0;
-    background: white;
-    color: black;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-#menuContent div {
-    padding: 10px;
-    cursor: pointer;
-}
-
-#menuContent div:hover {
-    background: #eee;
-}
 </style>
 </head>
 
 <body>
 
 <header>
-    <div class="title">Gabriel IA</div>
-
-    <div id="menu">
-        <button onclick="toggleMenu()">⋮</button>
-        <div id="menuContent">
-            <div onclick="quizMode()">🎯 Quiz IA</div>
-            <div onclick="searchMode()">🔎 Recherche</div>
-            <div onclick="reflectionMode()">🧠 Réflexion</div>
-        </div>
-    </div>
+    <div>🤖 Gabriel IA Pro</div>
 </header>
 
 <div id="chat"></div>
 
 <div id="inputArea">
-    <input id="input" placeholder="Écris un message...">
+    <input id="input" placeholder="Écris ton message...">
     <button onclick="send()">➤</button>
-    <button onclick="voice()">🎤</button>
 </div>
 
 <script>
+
+const API_KEY = "TA_CLE_API_ICI"; // 🔴 IMPORTANT
+
 let chat = document.getElementById("chat");
 
 function addMsg(text, type){
@@ -131,14 +92,7 @@ function addMsg(text, type){
     chat.scrollTop = chat.scrollHeight;
 }
 
-/* SIMPLE IA (remplace par API plus tard) */
-function botReply(msg){
-    if(msg.includes("bonjour")) return "Salut 👋 je suis Gabriel IA";
-    if(msg.includes("quiz")) return "Mode quiz activé 🎯";
-    return "Je réfléchis... 🤖 " + msg;
-}
-
-function send(){
+async function send(){
     let input = document.getElementById("input");
     let text = input.value;
     if(!text) return;
@@ -146,50 +100,31 @@ function send(){
     addMsg(text, "user");
     input.value = "";
 
-    setTimeout(() => {
-        addMsg(botReply(text), "bot");
-    }, 500);
+    addMsg("⏳ réflexion...", "bot");
+
+    let response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + API_KEY
+        },
+        body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+                {role: "system", content: "Tu es Gabriel IA, une IA utile et claire."},
+                {role: "user", content: text}
+            ]
+        })
+    });
+
+    let data = await response.json();
+
+    chat.lastChild.remove(); // enlève "réflexion..."
+
+    let reply = data.choices[0].message.content;
+    addMsg(reply, "bot");
 }
 
-/* MENU */
-function toggleMenu(){
-    let m = document.getElementById("menuContent");
-    m.style.display = m.style.display === "block" ? "none" : "block";
-}
-
-function quizMode(){
-    addMsg("🎯 Quiz : Combien font 2 + 2 ?", "bot");
-}
-
-function searchMode(){
-    addMsg("🔎 Recherche activée (simulation)", "bot");
-}
-
-function reflectionMode(){
-    addMsg("🧠 Mode réflexion activé : pose une question complexe", "bot");
-}
-
-/* VOICE */
-function voice(){
-    let rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    rec.lang = "fr-FR";
-    rec.start();
-
-    rec.onresult = function(e){
-        let text = e.results[0][0].transcript;
-        document.getElementById("input").value = text;
-    }
-}
-
-/* SAUVEGARDE SIMPLE */
-window.onload = () => {
-    let saved = localStorage.getItem("chat");
-    if(saved) chat.innerHTML = saved;
-}
-
-window.onbeforeunload = () => {
-    localStorage.setItem("chat", chat.innerHTML);
-}
 </script>
 
 </body>
