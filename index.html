@@ -1,694 +1,211 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IA Plateforme Complète - Gabriel Ronald</title>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gabronal</title>
 <style>
-
-* {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-font-family: Arial, Helvetica, sans-serif;
+body{
+margin:0;
+font-family:Arial, sans-serif;
+display:flex;
+height:100vh;
+background:#0f172a;
+color:white;
 }
 
-body {
-background: #0f172a;
-color: white;
-display: flex;
-height: 100vh;
-overflow: hidden;
+/* SIDEBAR */
+#sidebar{
+width:280px;
+background:#111827;
+display:flex;
+flex-direction:column;
+padding:10px;
 }
 
-.sidebar {
-width: 260px;
-background: #020617;
-padding: 15px;
-display: flex;
-flex-direction: column;
-gap: 10px;
-border-right: 1px solid #1e293b;
+#newChat{
+padding:10px;
+background:#2563eb;
+border:none;
+color:white;
+cursor:pointer;
+border-radius:8px;
+margin-bottom:10px;
 }
 
-.sidebar button {
-padding: 10px;
-border-radius: 10px;
-border: none;
-background: #1e293b;
-color: white;
-cursor: pointer;
+.chat-item{
+padding:10px;
+margin:5px 0;
+background:#1f2937;
+border-radius:6px;
+cursor:pointer;
+overflow:hidden;
+white-space:nowrap;
+text-overflow:ellipsis;
 }
 
-.sidebar button:hover {
-background: #334155;
+.chat-item.active{
+background:#374151;
 }
 
-.main {
-flex: 1;
-display: flex;
-flex-direction: column;
+/* CHAT */
+#chat-container{
+flex:1;
+display:flex;
+flex-direction:column;
 }
 
-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 12px;
-background: #020617;
-border-bottom: 1px solid #1e293b;
+#messages{
+flex:1;
+padding:15px;
+overflow-y:auto;
 }
 
-.logo svg {
-width: 42px;
+.message{
+padding:10px;
+margin:5px 0;
+border-radius:10px;
+max-width:70%;
 }
 
-.mode-buttons button {
-padding: 6px 10px;
-border-radius: 10px;
-border: none;
-cursor: pointer;
-margin-left: 6px;
+.user{
+background:#2563eb;
+align-self:flex-end;
 }
 
-.mode-active {
-background: linear-gradient(90deg, #2563eb, #7c3aed);
-color: white;
+.bot{
+background:#1f2937;
+align-self:flex-start;
 }
 
-.chat-container {
-flex: 1;
-display: flex;
-flex-direction: column;
-padding: 12px;
+#input-area{
+display:flex;
+padding:10px;
+background:#111827;
 }
 
-.chat-box {
-flex: 1;
-overflow-y: auto;
-padding: 14px;
-border-radius: 18px;
-animation: gradientShift 12s infinite alternate;
+input{
+flex:1;
+padding:10px;
+border:none;
+border-radius:8px;
+outline:none;
 }
 
-@keyframes gradientShift {
-0% { background: linear-gradient(120deg, #2563eb, #7c3aed); }
-50% { background: linear-gradient(120deg, #3b82f6, #9333ea); }
-100% { background: linear-gradient(120deg, #2563eb, #7c3aed); }
+button{
+margin-left:10px;
+padding:10px 15px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#22c55e;
+color:white;
 }
-
-.message {
-padding: 10px 14px;
-border-radius: 14px;
-margin-bottom: 10px;
-max-width: 75%;
-}
-
-.user {
-background: #020617;
-margin-left: auto;
-}
-
-.ai {
-background: #1e293b;
-}
-
-.input-area {
-display: flex;
-gap: 8px;
-margin-top: 10px;
-}
-
-input[type="text"] {
-flex: 1;
-padding: 10px;
-border-radius: 12px;
-border: none;
-}
-
-button {
-padding: 10px;
-border-radius: 12px;
-border: none;
-cursor: pointer;
-}
-
-.voice-btn { background: #2563eb; color: white; }
-.file-btn { background: #7c3aed; color: white; }
-.send-btn { background: #10b981; color: white; }
-
-.quiz-container {
-margin-top: 12px;
-background: #020617;
-padding: 12px;
-border-radius: 14px;
-}
-
-.quiz-options {
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 10px;
-}
-
-.quiz-options img {
-width: 100%;
-border-radius: 12px;
-cursor: pointer;
-border: 3px solid transparent;
-}
-
-.correct { border-color: #22c55e; }
-.wrong { border-color: #ef4444; }
-
-.level-box {
-margin-top: 10px;
-padding: 10px;
-background: #020617;
-border-radius: 10px;
-}
-
-@media (max-width: 700px) {
-.sidebar { width: 70px; }
-}
-
 </style>
-
 </head>
-
 <body>
 
-<div class="sidebar">
-
-<button onclick="newChat()">➕ Nouveau</button>
-
-<button onclick="loadHistory()">📜 Historique</button>
-
-<button onclick="clearHistory()">🗑️ Effacer</button>
-
-<button onclick="generateQuiz()">🧠 Quiz</button>
-
-<button onclick="switchLanguage()">🌍 Langue</button>
-
-<button onclick="loginUser()">👤 Compte</button>
-
-<button onclick="chooseLevel()">🎓 Niveau</button>
-
-<button onclick="publishSite()">🚀 Publier</button>
-
+<div id="sidebar">
+<button id="newChat">+ Nouveau</button>
+<div id="chatList"></div>
 </div>
 
-<div class="main">
-
-<header>
-
-<div class="logo">
-
-<svg viewBox="0 0 100 100">
-<defs>
-<linearGradient id="metaGradient" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0%" stop-color="#1877F2" />
-<stop offset="50%" stop-color="#9333EA" />
-<stop offset="100%" stop-color="#00C6FF" />
-</linearGradient>
-</defs>
-
-<circle cx="50" cy="50" r="45" fill="url(#metaGradient)" />
-
-<text x="50" y="60" text-anchor="middle" font-size="50" fill="white" font-weight="bold">
-G
-</text>
-
-</svg>
-
-<strong>IA Gabriel</strong>
-
+<div id="chat-container">
+<div id="messages"></div>
+<div id="input-area">
+<input id="textInput" placeholder="Écris un message..." />
+<button onclick="sendMessage()">Envoyer</button>
 </div>
-
-<div class="mode-buttons">
-
-<button id="searchMode" class="mode-active">Recherche</button>
-
-<button id="deepMode">Réflexion</button>
-
-</div>
-
-</header>
-
-<div class="chat-container">
-
-<div class="level-box" id="levelBox">
-Niveau : Non défini
-</div>
-
-<div class="chat-box" id="chatBox"></div>
-
-<div class="quiz-container" id="quiz"></div>
-
-<div class="input-area">
-
-<input type="text" id="userInput" placeholder="Écris ton message...">
-
-<button class="voice-btn" onclick="startVoice()">🎤</button>
-
-<label class="file-btn">
-📎
-<input type="file" id="fileInput" hidden>
-</label>
-
-<button class="send-btn" onclick="sendMessage()">Envoyer</button>
-
-</div>
-
-</div>
-
 </div>
 
 <script>
+let conversations = JSON.parse(localStorage.getItem("conversations")) || [];
+let currentChatId = null;
 
-/* ======================
-UTILISATEUR
-====================== */
-
-function loginUser() {
-
-let name = prompt("Entre ton nom :");
-
-if (name) {
-
-localStorage.setItem("user", name);
-
-addMessage("Connecté comme " + name, "ai");
-
+function save() {
+localStorage.setItem("conversations", JSON.stringify(conversations));
 }
 
+function createChat() {
+const chat = {
+id: Date.now(),
+title: "Nouvelle conversation",
+messages: []
+};
+conversations.unshift(chat);
+currentChatId = chat.id;
+save();
+renderChats();
+renderMessages();
 }
 
-/* ======================
-LANGUE
-====================== */
+function renderChats() {
+const list = document.getElementById("chatList");
+list.innerHTML = "";
 
-let language = "fr";
-
-function switchLanguage() {
-
-if (language === "fr") {
-
-language = "en";
-
-addMessage("Language switched to English", "ai");
-
-} else {
-
-language = "fr";
-
-addMessage("Langue changée en français", "ai");
-
+conversations.forEach(c => {
+const div = document.createElement("div");
+div.className = "chat-item" + (c.id === currentChatId ? " active" : "");
+div.innerText = c.title;
+div.onclick = () => {
+currentChatId = c.id;
+renderChats();
+renderMessages();
+};
+list.appendChild(div);
+});
 }
 
+function renderMessages() {
+const chat = conversations.find(c => c.id === currentChatId);
+const box = document.getElementById("messages");
+box.innerHTML = "";
+if(!chat) return;
+
+chat.messages.forEach(m => {
+const div = document.createElement("div");
+div.className = "message " + m.role;
+div.innerText = m.text;
+box.appendChild(div);
+});
 }
-
-/* ======================
-NIVEAU SCOLAIRE
-====================== */
-
-function chooseLevel() {
-
-let level = prompt(
-"Choisis ton niveau :\\nCP\\nCE1\\nCE2\\nCM1\\nCM2\\n6e\\n5e\\n4e\\n3e\\nSeconde\\nPremière\\nTerminale"
-);
-
-if (level) {
-
-document.getElementById("levelBox").innerText =
-"Niveau : " + level;
-
-localStorage.setItem("level", level);
-
-addMessage("Niveau défini : " + level, "ai");
-
-}
-
-}
-
-/* ======================
-MEMOIRE
-====================== */
-
-let history = JSON.parse(localStorage.getItem("chatHistory")) || [];
-
-function saveHistory() {
-
-localStorage.setItem("chatHistory", JSON.stringify(history));
-
-}
-
-/* ======================
-CHAT
-====================== */
 
 function sendMessage() {
+const input = document.getElementById("textInput");
+const text = input.value.trim();
+if(!text) return;
 
-const input = document.getElementById("userInput");
+let chat = conversations.find(c => c.id === currentChatId);
+if(!chat) return;
 
-const text = input.value;
+chat.messages.push({role:"user", text});
 
-if (!text) return;
+// Réponse IA simple
+chat.messages.push({role:"bot", text:"Je suis Gabronal IA 🤖"});
 
-addMessage(text, "user");
+// update title
+if(chat.title === "Nouvelle conversation"){
+chat.title = text.slice(0,20);
+}
 
 input.value = "";
-
-setTimeout(() => {
-
-addMessage(
-"Réponse IA prête (connectable à une vraie IA API).",
-"ai"
-);
-
-}, 700);
-
+save();
+renderMessages();
+renderChats();
 }
 
-function addMessage(text, sender) {
-
-const chatBox = document.getElementById("chatBox");
-
-const div = document.createElement("div");
-
-div.className = "message " + sender;
-
-div.textContent = text;
-
-chatBox.appendChild(div);
-
-chatBox.scrollTop = chatBox.scrollHeight;
-
-history.push({ text, sender });
-
-saveHistory();
-
-}
-
-function newChat() {
-
-document.getElementById("chatBox").innerHTML = "";
-
-}
-
-function loadHistory() {
-
-const chatBox = document.getElementById("chatBox");
-
-chatBox.innerHTML = "";
-
-history.forEach(msg => {
-
-const div = document.createElement("div");
-
-div.className = "message " + msg.sender;
-
-div.textContent = msg.text;
-
-chatBox.appendChild(div);
-
-});
-
-}
-
-function clearHistory() {
-
-localStorage.removeItem("chatHistory");
-
-history = [];
-
-newChat();
-
-}
-
-/* ======================
-VOICE
-====================== */
-
-function startVoice() {
-
-if (!('webkitSpeechRecognition' in window)) {
-
-alert("Voice non supportée");
-
-return;
-
-}
-
-const recognition = new webkitSpeechRecognition();
-
-recognition.lang = "fr-FR";
-
-recognition.onresult = function(event) {
-
-const text = event.results[0][0].transcript;
-
-document.getElementById("userInput").value = text;
-
+// NEW CHAT
+document.getElementById("newChat").onclick = () => {
+createChat();
 };
 
-recognition.start();
-
-}
-
-/* ======================
-FICHIER
-====================== */
-
-document.getElementById("fileInput").addEventListener(
-"change",
-function() {
-
-const file = this.files[0];
-
-if (file) {
-
-addMessage("Fichier envoyé : " + file.name, "user");
-
-}
-
-}
-);
-
-/* ======================
-QUIZ
-====================== */
-
-function generateQuiz() {
-
-const quizData = {
-
-question: "Quel animal vole ?",
-
-correctIndex: 2,
-
-explanation: "L'aigle vole grâce à ses ailes.",
-
-options: [
-
-"https://upload.wikimedia.org/wikipedia/commons/7/79/Lion_waiting_in_Namibia.jpg",
-
-"https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg",
-
-"https://upload.wikimedia.org/wikipedia/commons/e/e7/Golden_Eagle_in_flight_-_5.jpg",
-
-"https://upload.wikimedia.org/wikipedia/commons/5/5f/Elephant_near_ndutu.jpg"
-
-]
-
-};
-
-let answered = false;
-
-const container = document.getElementById("quiz");
-
-container.innerHTML = `
-
-<h3>${quizData.question}</h3>
-
-<div class="quiz-options">
-
-${quizData.options
-.map(
-(img, index) => `
-
-<img src="${img}" onclick="selectAnswer(${index}, this)">
-
-`
-)
-.join("")}
-
-</div>
-
-<button onclick="showCorrection()">Correction</button>
-
-`;
-
-window.selectAnswer = function(index, element) {
-
-if (answered) return;
-
-answered = true;
-
-if (index === quizData.correctIndex) {
-
-element.classList.add("correct");
-
-addMessage("Bonne réponse !", "ai");
-
+// INIT
+if(conversations.length === 0){
+createChat();
 } else {
-
-element.classList.add("wrong");
-
-addMessage("Réponse enregistrée.", "ai");
-
-}
-
-};
-
-window.showCorrection = function() {
-
-addMessage(
-"Correction : " + quizData.explanation,
-"ai"
-);
-
-};
-
-}
-
-/* ======================
-PUBLICATION
-====================== */
-
-function publishSite() {
-
-addMessage(
-"Ton site est prêt à être publié sur GitHub Pages 🚀",
-"ai"
-);
-
-}
-
-/* ======================
-MODE
-====================== */
-
-const searchBtn = document.getElementById("searchMode");
-const deepBtn = document.getElementById("deepMode");
-
-searchBtn.onclick = () => {
-
-searchBtn.classList.add("mode-active");
-
-deepBtn.classList.remove("mode-active");
-
-addMessage("Mode recherche activé", "ai");
-
-};
-
-deepBtn.onclick = () => {
-
-deepBtn.classList.add("mode-active");
-
-searchBtn.classList.remove("mode-active");
-
-addMessage("Mode réflexion approfondie activé", "ai");
-
-};
-
-</script>
-
-
-
-<!-- ===== NOUVELLES FONCTIONNALITÉS AVANCÉES ===== -->
-<script>
-// ===== BASE DE DONNÉES (Simulation Firebase Ready) =====
-const database = {
-    users: JSON.parse(localStorage.getItem("users") || "[]"),
-    scores: JSON.parse(localStorage.getItem("scores") || "[]")
-};
-
-function saveUser(name) {
-    if (!database.users.includes(name)) {
-        database.users.push(name);
-        localStorage.setItem("users", JSON.stringify(database.users));
-        alert("Compte enregistré : " + name);
-    }
-}
-
-// ===== BADGES SYSTEM =====
-function awardBadge(badge) {
-    let badges = JSON.parse(localStorage.getItem("badges") || "[]");
-    if (!badges.includes(badge)) {
-        badges.push(badge);
-        localStorage.setItem("badges", JSON.stringify(badges));
-        alert("Nouveau badge obtenu : " + badge);
-    }
-}
-
-// ===== CLASSEMENT =====
-function addScore(score) {
-    database.scores.push(score);
-    localStorage.setItem("scores", JSON.stringify(database.scores));
-}
-
-function showLeaderboard() {
-    let scores = JSON.parse(localStorage.getItem("scores") || "[]");
-    alert("Classement : " + scores.sort((a,b)=>b-a).join(", "));
-}
-
-// ===== MATIÈRES =====
-const subjects = [
-    "Maths",
-    "Français",
-    "Anglais",
-    "Histoire",
-    "Géographie",
-    "Sciences",
-    "Informatique"
-];
-
-function chooseSubject() {
-    let subject = prompt("Choisis une matière :
-" + subjects.join("
-"));
-    if (subject) {
-        localStorage.setItem("subject", subject);
-        alert("Matière sélectionnée : " + subject);
-    }
-}
-
-// ===== PWA / APPLICATION MOBILE READY =====
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-    .then(()=>console.log("Service Worker enregistré"));
-}
-
-// ===== CONNEXION VRAIE IA (API READY) =====
-async function connectRealAI(message) {
-    // Exemple de structure pour API (à compléter plus tard)
-    console.log("Message envoyé à l'IA : ", message);
-    return "Réponse IA simulée : " + message;
-}
-
-// ===== CONNEXION GOOGLE (Simulation sécurisée) =====
-function loginWithGoogle() {
-    let name = prompt("Entre ton nom Google :");
-    if (name) {
-        localStorage.setItem("googleUser", name);
-        alert("Connecté avec Google : " + name);
-    }
-}
-
-// ===== PUBLICATION CHECK =====
-function publishSite() {
-    alert("Ton site est prêt à être publié sur GitHub Pages ou transformé en application Android.");
+currentChatId = conversations[0].id;
+renderChats();
+renderMessages();
 }
 </script>
 
