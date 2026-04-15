@@ -1,211 +1,194 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Gabronal</title>
+<meta charset="UTF-8">
+<title>Gabriel IA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-body{
-margin:0;
-font-family:Arial, sans-serif;
-display:flex;
-height:100vh;
-background:#0f172a;
-color:white;
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
 }
 
-/* SIDEBAR */
-#sidebar{
-width:280px;
-background:#111827;
-display:flex;
-flex-direction:column;
-padding:10px;
+/* HEADER */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #111827;
 }
 
-#newChat{
-padding:10px;
-background:#2563eb;
-border:none;
-color:white;
-cursor:pointer;
-border-radius:8px;
-margin-bottom:10px;
-}
-
-.chat-item{
-padding:10px;
-margin:5px 0;
-background:#1f2937;
-border-radius:6px;
-cursor:pointer;
-overflow:hidden;
-white-space:nowrap;
-text-overflow:ellipsis;
-}
-
-.chat-item.active{
-background:#374151;
+.title {
+    font-size: 18px;
+    font-weight: bold;
 }
 
 /* CHAT */
-#chat-container{
-flex:1;
-display:flex;
-flex-direction:column;
+#chat {
+    height: 70vh;
+    overflow-y: auto;
+    padding: 10px;
 }
 
-#messages{
-flex:1;
-padding:15px;
-overflow-y:auto;
+.msg {
+    padding: 10px;
+    margin: 8px;
+    border-radius: 10px;
+    max-width: 80%;
 }
 
-.message{
-padding:10px;
-margin:5px 0;
-border-radius:10px;
-max-width:70%;
+.user {
+    background: #2563eb;
+    margin-left: auto;
 }
 
-.user{
-background:#2563eb;
-align-self:flex-end;
+.bot {
+    background: #374151;
 }
 
-.bot{
-background:#1f2937;
-align-self:flex-start;
+/* INPUT */
+#inputArea {
+    display: flex;
+    padding: 10px;
+    background: #111827;
 }
 
-#input-area{
-display:flex;
-padding:10px;
-background:#111827;
+input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
 }
 
-input{
-flex:1;
-padding:10px;
-border:none;
-border-radius:8px;
-outline:none;
+button {
+    margin-left: 5px;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
-button{
-margin-left:10px;
-padding:10px 15px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-background:#22c55e;
-color:white;
+#menu {
+    position: relative;
+}
+
+#menuContent {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: white;
+    color: black;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#menuContent div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#menuContent div:hover {
+    background: #eee;
 }
 </style>
 </head>
+
 <body>
 
-<div id="sidebar">
-<button id="newChat">+ Nouveau</button>
-<div id="chatList"></div>
-</div>
+<header>
+    <div class="title">Gabriel IA</div>
 
-<div id="chat-container">
-<div id="messages"></div>
-<div id="input-area">
-<input id="textInput" placeholder="Écris un message..." />
-<button onclick="sendMessage()">Envoyer</button>
-</div>
+    <div id="menu">
+        <button onclick="toggleMenu()">⋮</button>
+        <div id="menuContent">
+            <div onclick="quizMode()">🎯 Quiz IA</div>
+            <div onclick="searchMode()">🔎 Recherche</div>
+            <div onclick="reflectionMode()">🧠 Réflexion</div>
+        </div>
+    </div>
+</header>
+
+<div id="chat"></div>
+
+<div id="inputArea">
+    <input id="input" placeholder="Écris un message...">
+    <button onclick="send()">➤</button>
+    <button onclick="voice()">🎤</button>
 </div>
 
 <script>
-let conversations = JSON.parse(localStorage.getItem("conversations")) || [];
-let currentChatId = null;
+let chat = document.getElementById("chat");
 
-function save() {
-localStorage.setItem("conversations", JSON.stringify(conversations));
+function addMsg(text, type){
+    let div = document.createElement("div");
+    div.className = "msg " + type;
+    div.innerText = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
 }
 
-function createChat() {
-const chat = {
-id: Date.now(),
-title: "Nouvelle conversation",
-messages: []
-};
-conversations.unshift(chat);
-currentChatId = chat.id;
-save();
-renderChats();
-renderMessages();
+/* SIMPLE IA (remplace par API plus tard) */
+function botReply(msg){
+    if(msg.includes("bonjour")) return "Salut 👋 je suis Gabriel IA";
+    if(msg.includes("quiz")) return "Mode quiz activé 🎯";
+    return "Je réfléchis... 🤖 " + msg;
 }
 
-function renderChats() {
-const list = document.getElementById("chatList");
-list.innerHTML = "";
+function send(){
+    let input = document.getElementById("input");
+    let text = input.value;
+    if(!text) return;
 
-conversations.forEach(c => {
-const div = document.createElement("div");
-div.className = "chat-item" + (c.id === currentChatId ? " active" : "");
-div.innerText = c.title;
-div.onclick = () => {
-currentChatId = c.id;
-renderChats();
-renderMessages();
-};
-list.appendChild(div);
-});
+    addMsg(text, "user");
+    input.value = "";
+
+    setTimeout(() => {
+        addMsg(botReply(text), "bot");
+    }, 500);
 }
 
-function renderMessages() {
-const chat = conversations.find(c => c.id === currentChatId);
-const box = document.getElementById("messages");
-box.innerHTML = "";
-if(!chat) return;
-
-chat.messages.forEach(m => {
-const div = document.createElement("div");
-div.className = "message " + m.role;
-div.innerText = m.text;
-box.appendChild(div);
-});
+/* MENU */
+function toggleMenu(){
+    let m = document.getElementById("menuContent");
+    m.style.display = m.style.display === "block" ? "none" : "block";
 }
 
-function sendMessage() {
-const input = document.getElementById("textInput");
-const text = input.value.trim();
-if(!text) return;
-
-let chat = conversations.find(c => c.id === currentChatId);
-if(!chat) return;
-
-chat.messages.push({role:"user", text});
-
-// Réponse IA simple
-chat.messages.push({role:"bot", text:"Je suis Gabronal IA 🤖"});
-
-// update title
-if(chat.title === "Nouvelle conversation"){
-chat.title = text.slice(0,20);
+function quizMode(){
+    addMsg("🎯 Quiz : Combien font 2 + 2 ?", "bot");
 }
 
-input.value = "";
-save();
-renderMessages();
-renderChats();
+function searchMode(){
+    addMsg("🔎 Recherche activée (simulation)", "bot");
 }
 
-// NEW CHAT
-document.getElementById("newChat").onclick = () => {
-createChat();
-};
+function reflectionMode(){
+    addMsg("🧠 Mode réflexion activé : pose une question complexe", "bot");
+}
 
-// INIT
-if(conversations.length === 0){
-createChat();
-} else {
-currentChatId = conversations[0].id;
-renderChats();
-renderMessages();
+/* VOICE */
+function voice(){
+    let rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    rec.lang = "fr-FR";
+    rec.start();
+
+    rec.onresult = function(e){
+        let text = e.results[0][0].transcript;
+        document.getElementById("input").value = text;
+    }
+}
+
+/* SAUVEGARDE SIMPLE */
+window.onload = () => {
+    let saved = localStorage.getItem("chat");
+    if(saved) chat.innerHTML = saved;
+}
+
+window.onbeforeunload = () => {
+    localStorage.setItem("chat", chat.innerHTML);
 }
 </script>
 
